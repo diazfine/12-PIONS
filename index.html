@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="fr" translate="no" class="notranslate">
+  <head>
+    <script>
+      (function() {
+        try {
+          // React Fast Refresh preamble definition so @vitejs/plugin-react never throws in dev/SSR
+          window.$RefreshReg$ = function() {};
+          window.$RefreshSig$ = function() { return function(type) { return type; }; };
+          window.__vite_plugin_react_preamble_installed__ = true;
+
+          // 1. Mock Vite HMR WebSocket so it never fails or throws 'WebSocket closed without opened' in preview iframe
+          var RealWebSocket = window.WebSocket;
+          if (typeof RealWebSocket === 'function' && !window.__VITE_HMR_WS_MOCKED__) {
+            window.__VITE_HMR_WS_MOCKED__ = true;
+            function MockHmrSocket(url, protocols) {
+              var urlStr = String(url || '');
+              if (urlStr.indexOf('/ws') !== -1 && protocols !== 'vite-hmr' && protocols !== 'vite-ping') {
+                return new RealWebSocket(url, protocols);
+              }
+              var target = new EventTarget();
+              var dummy = {
+                url: urlStr,
+                readyState: 1, // OPEN
+                bufferedAmount: 0,
+                extensions: '',
+                protocol: typeof protocols === 'string' ? protocols : 'vite-hmr',
+                binaryType: 'blob',
+                CONNECTING: 0,
+                OPEN: 1,
+                CLOSING: 2,
+                CLOSED: 3,
+                send: function() {},
+                close: function() {},
+                addEventListener: function(type, listener, options) {
+                  target.addEventListener(type, listener, options);
+                },
+                removeEventListener: function(type, listener, options) {
+                  target.removeEventListener(type, listener, options);
+                },
+                dispatchEvent: function(event) {
+                  return target.dispatchEvent(event);
+                },
+                onopen: null,
+                onmessage: null,
+                onerror: null,
+                onclose: null,
+              };
+              setTimeout(function() {
+                var ev = new Event('open');
+                if (typeof dummy.onopen === 'function') dummy.onopen(ev);
+                dummy.dispatchEvent(ev);
+              }, 0);
+              return dummy;
+            }
+            MockHmrSocket.prototype = RealWebSocket.prototype;
+            MockHmrSocket.CONNECTING = RealWebSocket.CONNECTING;
+            MockHmrSocket.OPEN = RealWebSocket.OPEN;
+            MockHmrSocket.CLOSING = RealWebSocket.CLOSING;
+            MockHmrSocket.CLOSED = RealWebSocket.CLOSED;
+            window.WebSocket = MockHmrSocket;
+          }
+
+          // 2. Suppress Vite HMR logs and errors from console
+          var isViteLog = function(args) {
+            if (!args || !args.length) return false;
+            try {
+              for (var i = 0; i < args.length; i++) {
+                var str = '';
+                var a = args[i];
+                if (typeof a === 'string') {
+                  str = a;
+                } else if (a && typeof a === 'object') {
+                  str = (a.message || '') + ' ' + (a.stack || '') + ' ' + (a.reason || '') + ' ' + (typeof a.toString === 'function' ? a.toString() : '');
+                } else {
+                  str = String(a);
+                }
+                if (
+                  str.indexOf('[vite]') !== -1 ||
+                  str.indexOf('vite-hmr') !== -1 ||
+                  str.indexOf('[hmr]') !== -1 ||
+                  str.indexOf('/@vite/client') !== -1 ||
+                  str.indexOf('WebSocket closed without opened') !== -1 ||
+                  str.indexOf('polling for restart') !== -1
+                ) {
+                  return true;
+                }
+              }
+            } catch (e) {}
+            return false;
+          };
+          ['error', 'warn', 'log', 'info', 'debug', 'trace'].forEach(function(m) {
+            var orig = console[m];
+            if (orig) {
+              console[m] = function() {
+                if (isViteLog(arguments)) return;
+                return orig.apply(console, arguments);
+              };
+            }
+          });
+          window.addEventListener('error', function(e) {
+            var msg = e ? (e.message || (e.error && e.error.message) || '') : '';
+            var str = String(msg);
+            if (
+              str.indexOf('[vite]') !== -1 ||
+              str.indexOf('vite-hmr') !== -1 ||
+              str.indexOf('/@vite/client') !== -1 ||
+              str.indexOf('WebSocket closed without opened') !== -1 ||
+              str.indexOf('polling for restart') !== -1
+            ) {
+              if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+              if (e.stopPropagation) e.stopPropagation();
+              if (e.preventDefault) e.preventDefault();
+              return true;
+            }
+          }, true);
+          window.addEventListener('unhandledrejection', function(e) {
+            var reason = e ? (e.reason || e.message || '') : '';
+            var str = typeof reason === 'object' ? (reason.message || '') + ' ' + (reason.stack || '') : String(reason);
+            if (
+              str.indexOf('[vite]') !== -1 ||
+              str.indexOf('vite-hmr') !== -1 ||
+              str.indexOf('/@vite/client') !== -1 ||
+              str.indexOf('WebSocket closed without opened') !== -1 ||
+              str.indexOf('polling for restart') !== -1
+            ) {
+              if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+              if (e.stopPropagation) e.stopPropagation();
+              if (e.preventDefault) e.preventDefault();
+              return true;
+            }
+          }, true);
+        } catch (e) {}
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>12 PIONS - Jeu de Stratégie Royal</title>
+    <meta
+      name="description"
+      content="Rejoins-moi pour une partie de 12 PIONS ! Jeu de Stratégie Royal universel. Jouez en ligne, avec des amis, contre l'IA, en tournoi ou en mode local."
+    />
+    
+    <!-- Open Graph Meta Tags for Social Sharing (WhatsApp, Telegram, Facebook, SMS) -->
+    <meta property="og:title" content="12 PIONS - Jeu de Stratégie Royal" />
+    <meta
+      property="og:description"
+      content="Rejoins-moi pour une partie de 12 PIONS ! Jeu de Stratégie Royal universel. Défie tes amis en ligne !"
+    />
+    <meta property="og:type" content="game" />
+    <meta property="og:image" content="https://ais-pre-3lksjla3mwka57icdxz4l5-654478324591.europe-west1.run.app/og-banner.png?v=3" />
+    <meta property="og:image:secure_url" content="https://ais-pre-3lksjla3mwka57icdxz4l5-654478324591.europe-west1.run.app/og-banner.png?v=3" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="12 PIONS - Jeu de Stratégie Royal" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="12 PIONS - Jeu de Stratégie Royal" />
+    <meta
+      name="twitter:description"
+      content="Rejoins-moi pour une partie de 12 PIONS ! Jeu de Stratégie Royal universel."
+    />
+    <meta name="twitter:image" content="https://ais-pre-3lksjla3mwka57icdxz4l5-654478324591.europe-west1.run.app/og-banner.png?v=3" />
+
+    <!-- Favicon and App Icons (Official 12 PIONS Board Icon) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=3" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=3" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
+    <link rel="manifest" href="/manifest.json?v=3" />
+    <script>
+      (function() {
+        try {
+          if (typeof window !== 'undefined' && window.location && window.location.origin) {
+            var origin = window.location.origin;
+            var ogImg = document.querySelector('meta[property="og:image"]');
+            if (ogImg) ogImg.setAttribute('content', origin + '/og-banner.png?v=3');
+            var ogImgSec = document.querySelector('meta[property="og:image:secure_url"]');
+            if (ogImgSec) ogImgSec.setAttribute('content', origin + '/og-banner.png?v=3');
+            var twImg = document.querySelector('meta[name="twitter:image"]');
+            if (twImg) twImg.setAttribute('content', origin + '/og-banner.png?v=3');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Cross-device & System compatibility (Android, MIUI, iOS Apple, Smart TV, Consoles PlayStation / PSP) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="D 12 PIONS" />
+    <meta name="application-name" content="D 12 PIONS" />
+    <meta name="theme-color" content="#083023" />
+    <meta name="msapplication-navbutton-color" content="#083023" />
+    <meta name="format-detection" content="telephone=no" />
+  </head>
+  <body class="bg-[#031c13] text-[#f0e6c8] overflow-x-hidden select-none touch-manipulation">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

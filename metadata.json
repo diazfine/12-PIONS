@@ -1,0 +1,6 @@
+{
+  "name": "12 PIONS - Jeu de Stratégie Royal",
+  "description": "12 PIONS - Jeu de Stratégie Royal universel. Jouez en ligne, avec des amis, contre l'IA, en tournoi ou en mode local à deux.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
